@@ -1,49 +1,62 @@
 <?php 
+
+
+//echo Taka::format(12345670000);
+
 class Taka{
-    public static function format($number, $default='0.00'){
+    public static function format($amount, $default='0.00'){
        
-        if(empty($number)){
+        if(empty($amount)){
             return $default;
         }
 
-        if(strstr($number,"-")) 
-        { 
-            $number = str_replace("-","",$number); 
+        $negative ="";
+        if(strstr($amount,"-")){ 
+            $amount = str_replace("-","",$amount); 
             $negative = "-"; 
         } 
         
-        $number = number_format((float)$number, 2, '.', '');
+        $amount = number_format((float)$amount, 2, '.', '');
 
-        $split_number = explode(".",$number); 
+        $split_number = explode(".",$amount); 
         
         $taka = $split_number[0]; 
         $poisa = $split_number[1]; 
         
-        if(strlen($taka)>3) 
-        { 
+        if(strlen($taka)>3){ 
+            $thousands ="";
             $hundreds = substr($taka,strlen($taka)-3); 
-            $thousands_in_reverse = strrev(substr($taka,0,strlen($taka)-3)); 
-            for($i=0; $i<(strlen($thousands_in_reverse)); $i=$i+2) 
-            { 
-                $thousands .= $thousands_in_reverse[$i].$thousands_in_reverse[$i+1].","; 
-            } 
-            $thousands = strrev(trim($thousands,",")); 
+            $strlen = strlen($taka)-3;
+            $substr = substr($taka,0, $strlen);
+           
+            $thousands = "";
+            $counter = 0;
+            for ($i=$strlen-1; $i >=0 ; $i = $i - 1) { 
+                $digit = $substr[$i];
+                $temp = $digit.$thousands;
+                $thousands = $temp;
+                $counter = $counter + 1;
+                if($counter == 2){
+                    if($i >0){
+                        $thousands = ",". $thousands;
+                    }
+                    $counter = 0;
+                }
+            }
+
             $formatted_taka = $thousands.",".$hundreds; 
-            
         } 
-        else 
-        { 
+        else{ 
             $formatted_taka = $taka; 
         } 
         
-        if((int)$poisa>0) 
-        { 
+        $formatted_poisa ="00";
+
+        if((int)$poisa>0){ 
             $formatted_poisa = ".".substr($poisa,0,2); 
         } 
         
-        // return $negative.$formatted_taka.$formatted_poisa; 
         return $negative.$formatted_taka.'.'.$formatted_poisa; 
-
     } 
 }
 ?>
